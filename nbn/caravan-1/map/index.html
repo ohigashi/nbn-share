@@ -325,7 +325,7 @@ h1.title {
 
 /* ============ Detail Panel ============ */
 .detail-panel {
-  position: absolute;
+  position: fixed;
   left: 16px; right: 16px; bottom: 16px;
   max-width: 420px;
   margin: 0 auto;
@@ -333,30 +333,34 @@ h1.title {
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: 6px;
-  box-shadow: 0 8px 24px rgba(30, 51, 37, 0.12), 0 2px 6px rgba(0,0,0,0.05);
-  z-index: 500;
-  transform: translateY(calc(100% + 24px));
-  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
-  pointer-events: none;
+  box-shadow: 0 8px 24px rgba(30, 51, 37, 0.18), 0 2px 6px rgba(0,0,0,0.08);
+  z-index: 10000;
+  display: none;
 }
 .detail-panel.visible {
-  transform: translateY(0);
-  pointer-events: auto;
+  display: block;
+  animation: slideUpIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes slideUpIn {
+  from { transform: translateY(calc(100% + 24px)); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
 }
 
 .detail-close {
   position: absolute;
-  top: 12px; right: 12px;
-  width: 28px; height: 28px;
+  top: 8px; right: 8px;
+  width: 36px; height: 36px;
   display: flex; align-items: center; justify-content: center;
   background: transparent;
   border: none;
   color: var(--muted);
   cursor: pointer;
-  font-size: 18px;
+  font-size: 22px;
   line-height: 1;
   border-radius: 50%;
   transition: all 150ms ease;
+  padding: 0;
+  z-index: 2;
 }
 .detail-close:hover {
   background: var(--cream);
@@ -694,7 +698,14 @@ function hideDetail() {
   if (activeMarkerEl) { activeMarkerEl.classList.remove('active'); activeMarkerEl = null; }
 }
 
-document.getElementById('detailClose').addEventListener('click', hideDetail);
+document.getElementById('detailClose').addEventListener('click', (e) => {
+  e.stopPropagation();
+  hideDetail();
+});
+
+// Prevent panel clicks from bubbling to the map
+panel.addEventListener('click', (e) => e.stopPropagation());
+
 map.on('click', hideDetail);
 
 // ============ Day Filter ============
