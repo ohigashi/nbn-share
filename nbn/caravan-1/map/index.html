@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="robots" content="noindex,nofollow" />
+<title>道北アクティビティキャラバン 2026.04.24–26 | north by north</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;600;800&family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+<style>
+:root {
+  --cream:       #f5efe4;
+  --cream-deep:  #ede4d3;
+  --paper:       #faf6ed;
+  --forest:      #2d4a36;
+  --forest-dark: #1e3325;
+  --gold:        #c8a15a;
+  --gold-soft:   #d9b77a;
+  --copper:      #8b5a3c;
+  --steam:       #6b8e9a;
+  --ink:         #1a1a1a;
+  --ink-soft:    #4a4a4a;
+  --muted:       #8a7f6f;
+  --line:        rgba(45, 74, 54, 0.15);
+
+  --font-display-ja: "Shippori Mincho B1", "Hiragino Mincho ProN", serif;
+  --font-display-en: "DM Serif Display", serif;
+  --font-body:       "Noto Sans JP", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono:       "IBM Plex Mono", ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: var(--cream);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
+}
+
+body {
+  display: flex; flex-direction: column;
+  min-height: 100vh; min-height: 100dvh;
+}
+
+/* ============ Header ============ */
+header.site-header {
+  position: relative;
+  padding: 28px 24px 20px;
+  background: var(--cream);
+  border-bottom: 1px solid var(--line);
+  z-index: 10;
+}
+
+.masthead {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.brand-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--muted);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.brand-mark {
+  color: var(--forest);
+  font-weight: 500;
+}
+
+.brand-mark::before {
+  content: "◆";
+  margin-right: 8px;
+  color: var(--gold);
+  font-size: 9px;
+  vertical-align: middle;
+}
+
+h1.title {
+  margin: 4px 0 2px;
+  font-family: var(--font-display-ja);
+  font-weight: 800;
+  font-size: clamp(28px, 5vw, 44px);
+  line-height: 1.15;
+  color: var(--forest-dark);
+  letter-spacing: 0.02em;
+}
+
+.subtitle-line {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 6px;
+  font-family: var(--font-display-en);
+  font-size: clamp(13px, 2vw, 16px);
+  font-style: italic;
+  color: var(--forest);
+  letter-spacing: 0.03em;
+}
+
+.subtitle-line .dates {
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-size: 11px;
+  color: var(--ink-soft);
+  letter-spacing: 0.2em;
+  font-weight: 400;
+}
+
+.subtitle-line .sep {
+  flex: 1;
+  max-width: 80px;
+  height: 1px;
+  background: var(--forest);
+  opacity: 0.3;
+}
+
+/* ============ Controls ============ */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 24px;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  z-index: 9;
+}
+.controls::-webkit-scrollbar { display: none; }
+
+.controls .label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  text-transform: uppercase;
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+.chip {
+  flex-shrink: 0;
+  padding: 7px 14px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--forest);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 180ms ease;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chip:hover { background: rgba(45, 74, 54, 0.06); border-color: var(--forest); }
+
+.chip[aria-pressed="true"] {
+  background: var(--forest);
+  color: var(--paper);
+  border-color: var(--forest);
+}
+
+.chip .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: currentColor;
+  opacity: 0.9;
+}
+.chip[data-day="1"] .dot { background: var(--forest); }
+.chip[data-day="2"] .dot { background: var(--gold); }
+.chip[data-day="3"] .dot { background: var(--copper); }
+.chip[aria-pressed="true"] .dot { background: var(--paper); opacity: 1; }
+
+.controls .toggle-group {
+  margin-left: auto;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 12px;
+  border-left: 1px solid var(--line);
+}
+
+.toggle-switch {
+  position: relative;
+  width: 36px; height: 20px;
+  background: var(--line);
+  border-radius: 100px;
+  cursor: pointer;
+  transition: background 180ms ease;
+  flex-shrink: 0;
+}
+.toggle-switch::after {
+  content: "";
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 16px; height: 16px;
+  background: var(--paper);
+  border-radius: 50%;
+  transition: left 180ms ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+.toggle-switch[aria-pressed="true"] {
+  background: var(--steam);
+}
+.toggle-switch[aria-pressed="true"]::after {
+  left: 18px;
+}
+
+.toggle-label {
+  font-size: 12px;
+  color: var(--ink-soft);
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* ============ Map ============ */
+.map-wrap {
+  flex: 1;
+  position: relative;
+  background: var(--cream-deep);
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  background: var(--cream-deep);
+}
+
+.leaflet-container {
+  font-family: var(--font-body);
+  background: var(--cream-deep);
+}
+
+.leaflet-control-zoom {
+  border: none !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+}
+.leaflet-control-zoom a {
+  background: var(--paper) !important;
+  color: var(--forest) !important;
+  border: 1px solid var(--line) !important;
+  font-family: var(--font-body);
+  font-weight: 500;
+}
+.leaflet-control-zoom a:hover {
+  background: var(--cream) !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(250, 246, 237, 0.85) !important;
+  font-family: var(--font-mono);
+  font-size: 9px !important;
+  color: var(--muted) !important;
+  padding: 2px 6px !important;
+}
+.leaflet-control-attribution a {
+  color: var(--forest) !important;
+}
+
+/* ============ Custom Markers ============ */
+.marker-pin {
+  position: relative;
+  width: 34px; height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -100%);
+  cursor: pointer;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.marker-pin:hover { transform: translate(-50%, -100%) scale(1.15); }
+.marker-pin.active { transform: translate(-50%, -100%) scale(1.2); }
+
+.marker-body {
+  width: 28px; height: 28px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  border: 2px solid var(--paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.marker-body span {
+  transform: rotate(45deg);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--paper);
+  line-height: 1;
+}
+.marker-pin[data-day="1"] .marker-body { background: var(--forest); }
+.marker-pin[data-day="2"] .marker-body { background: var(--gold); }
+.marker-pin[data-day="3"] .marker-body { background: var(--copper); }
+.marker-pin[data-optional="true"] .marker-body {
+  background: var(--steam);
+  border-style: dashed;
+}
+
+/* ============ Detail Panel ============ */
+.detail-panel {
+  position: absolute;
+  left: 16px; right: 16px; bottom: 16px;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 20px 22px 18px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(30, 51, 37, 0.12), 0 2px 6px rgba(0,0,0,0.05);
+  z-index: 500;
+  transform: translateY(calc(100% + 24px));
+  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+.detail-panel.visible {
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.detail-close {
+  position: absolute;
+  top: 12px; right: 12px;
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  border-radius: 50%;
+  transition: all 150ms ease;
+}
+.detail-close:hover {
+  background: var(--cream);
+  color: var(--ink);
+}
+
+.detail-time {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0.15em;
+  margin-bottom: 6px;
+}
+
+.detail-day-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--paper);
+  padding: 2px 8px;
+  border-radius: 3px;
+  letter-spacing: 0.1em;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.detail-day-tag[data-day="1"] { background: var(--forest); }
+.detail-day-tag[data-day="2"] { background: var(--gold); color: var(--forest-dark); }
+.detail-day-tag[data-day="3"] { background: var(--copper); }
+.detail-day-tag[data-optional="true"] { background: var(--steam); }
+
+.detail-title {
+  font-family: var(--font-display-ja);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--forest-dark);
+  margin: 2px 0 4px;
+  line-height: 1.25;
+  padding-right: 32px;
+}
+
+.detail-subtitle {
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-bottom: 12px;
+  font-weight: 400;
+}
+
+.detail-note {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--ink);
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  margin-bottom: 12px;
+}
+
+.detail-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--forest);
+  text-decoration: none;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--forest);
+  transition: opacity 150ms ease;
+}
+.detail-link:hover { opacity: 0.65; }
+.detail-link .arrow { font-size: 14px; line-height: 1; }
+
+/* ============ Footer ============ */
+footer.site-footer {
+  padding: 18px 24px;
+  background: var(--forest-dark);
+  color: var(--cream);
+  border-top: 1px solid var(--forest);
+  z-index: 10;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 20px;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.footer-notice {
+  flex: 1;
+  min-width: 240px;
+  color: var(--cream);
+  opacity: 0.85;
+}
+.footer-notice strong {
+  color: var(--gold-soft);
+  font-weight: 500;
+}
+
+.footer-sig {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--gold-soft);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+/* ============ Mobile tweaks ============ */
+@media (max-width: 600px) {
+  header.site-header { padding: 20px 18px 14px; }
+  .controls { padding: 12px 18px; }
+  .chip { padding: 6px 12px; font-size: 11.5px; }
+  .detail-panel {
+    left: 12px; right: 12px; bottom: 12px;
+    padding: 18px 18px 16px;
+  }
+  .detail-title { font-size: 19px; }
+  footer.site-footer { padding: 14px 18px; }
+  .brand-line .geo { display: none; }
+}
+
+/* Hide marker if filtered */
+.marker-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -100%) scale(0.4);
+}
+
+/* Route polyline animation */
+@keyframes dash-flow {
+  to { stroke-dashoffset: -24; }
+}
+.leaflet-overlay-pane path.route-line {
+  animation: dash-flow 2.4s linear infinite;
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="masthead">
+    <div class="brand-line">
+      <span class="brand-mark">north by north</span>
+      <span class="geo">44°N — DO-HOKU, HOKKAIDO</span>
+    </div>
+    <h1 class="title">道北アクティビティキャラバン</h1>
+    <div class="subtitle-line">
+      <span>An Itinerary for Three Days in the North</span>
+      <span class="sep"></span>
+      <span class="dates">2026.04.24 — 04.26</span>
+    </div>
+  </div>
+</header>
+
+<nav class="controls" aria-label="行程フィルター">
+  <span class="label">Filter</span>
+  <button class="chip" data-day="all" aria-pressed="true">すべて</button>
+  <button class="chip" data-day="1" aria-pressed="false"><span class="dot"></span>4/24 金</button>
+  <button class="chip" data-day="2" aria-pressed="false"><span class="dot"></span>4/25 土</button>
+  <button class="chip" data-day="3" aria-pressed="false"><span class="dot"></span>4/26 日</button>
+  <div class="toggle-group">
+    <span class="toggle-label">温泉</span>
+    <button class="toggle-switch" id="optionalToggle" aria-pressed="true" aria-label="温泉スポットの表示切替"></button>
+  </div>
+</nav>
+
+<div class="map-wrap">
+  <div id="map"></div>
+  <div class="detail-panel" id="detailPanel" role="dialog" aria-labelledby="detailTitle">
+    <button class="detail-close" id="detailClose" aria-label="閉じる">×</button>
+    <div>
+      <span class="detail-time" id="detailTime"></span>
+      <span class="detail-day-tag" id="detailDayTag"></span>
+    </div>
+    <h2 class="detail-title" id="detailTitle"></h2>
+    <div class="detail-subtitle" id="detailSubtitle"></div>
+    <div class="detail-note" id="detailNote"></div>
+    <a class="detail-link" id="detailLink" target="_blank" rel="noopener">
+      Google Maps で開く <span class="arrow">→</span>
+    </a>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-content">
+    <div class="footer-notice">
+      写真や感想のSNSシェアは大歓迎です。<strong>ただし、行程表や具体的なアクティビティの場所の公開はお控えください。</strong>地元の方々とガイドが守り育ててきた繊細なフィールドを大切にしながら、道北のアクティビティ文化を丁寧に育てていくためのお願いです。
+    </div>
+    <div class="footer-sig">north by north 事務局</div>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+// ============ Data ============
+const stops = [
+  { id: 1,  day: 1, seq: 1,  time: '19:00',   title: 'ナポートパークキャンプ場',       subtitle: '集合 〜 BBQ',                       lat: 44.800975, lng: 142.073734, note: '中川町。場内BBQハウスを使用。', optional: false, placeId: 'ChIJg4Z3zxkbDl8ROG_ag9pVSkg' },
+
+  { id: 2,  day: 2, seq: 1,  time: '9:00',    title: 'ナポートパークキャンプ場',       subtitle: '出発',                               lat: 44.800975, lng: 142.073734, note: '朝食は各自でご準備ください。町中にセイコーマートがあります。', optional: false, placeId: 'ChIJg4Z3zxkbDl8ROG_ag9pVSkg' },
+  { id: 3,  day: 2, seq: 2,  time: '15:00',   title: '砂澤ビッキギャラリー',           subtitle: 'エコミュージアムおさしまセンター',  lat: 44.737453, lng: 142.196218, note: '音威子府村。旧小学校を改装したビッキのアトリエ。入館300円。', optional: false, placeId: 'ChIJHS1K6B8EDl8RXl4bM13soto' },
+  { id: 4,  day: 2, seq: 3,  time: '17:00頃', title: 'びふか温泉',                     subtitle: '立ち寄り推奨 / Optional',           lat: 44.558627, lng: 142.323547, note: '美深町の日帰り温泉。入浴料500円前後、タオル150円前後、現金のみ。サウナと水風呂あり。立ち寄り時間は1時間弱を見込んでおくと良いでしょう。', optional: true, placeId: 'ChIJkQFTYjvlDV8RtQ8tARFm6s8' },
+  { id: 5,  day: 2, seq: 4,  time: '18:45',   title: 'サブちゃん',                     subtitle: '名寄市 / 焼肉',                      lat: 44.348408, lng: 142.463460, note: '18:45集合 / 19:00開始。名寄の老舗焼肉店。カブリ・ホルモンが名物。', optional: false, placeId: 'ChIJa2-E7EeUDV8RU_Pi7i5BY5E' },
+  { id: 6,  day: 2, seq: 5,  time: '21:30',   title: 'ゲストハウスゆらり',             subtitle: '下川町パンケ / 宿泊',                lat: 44.291210, lng: 142.624969, note: '築70年の古民家をリノベーションしたゲストハウス。薪ストーブあり。', optional: false, placeId: 'ChIJtf5Bk0WbDV8R-g7j49xJ8Fs' },
+
+  { id: 7,  day: 3, seq: 1,  time: '8:00',    title: 'ゲストハウスゆらり',             subtitle: '出発',                               lat: 44.291210, lng: 142.624969, note: '朝食は各自でご準備ください。下川市街にセイコーマートとセブンイレブンがあります。', optional: false, placeId: 'ChIJtf5Bk0WbDV8R-g7j49xJ8Fs' },
+  { id: 8,  day: 3, seq: 2,  time: '8:30',    title: '行者の滝',                       subtitle: '西興部村 / 散策',                    lat: 44.381255, lng: 142.833075, note: '国道から未舗装の砂利道を約4km進んだ先。熊出没注意の看板あり。4月末は残雪・路面状況に要注意。', optional: false, placeId: 'ChIJ5W9LdieGDV8RsKpYEEWyVn4' },
+  { id: 9,  day: 3, seq: 3,  time: '10:45',   title: 'MKファーム',                     subtitle: '下川町 / トマト定植作業',           lat: 44.319179, lng: 142.594622, note: '11:00より定植作業開始。汚れてもよい服装でお越しください。12:45終了・出発。', optional: false, placeId: 'ChIJZZvoEB-RDV8Rak_Z3_FMNdY' },
+  { id: 10, day: 3, seq: 4,  time: '13:00',   title: 'やまとや',                       subtitle: '下川町 / BBQ・解散',                lat: 44.303470, lng: 142.637491, note: '13:00開始 〜 15:00終了（解散）。', optional: false, placeId: 'ChIJqWVjoXaaDV8RZ89fknNrOW0' },
+  { id: 11, day: 3, seq: 5,  time: '15:10頃', title: '五味温泉',                       subtitle: '解散後のおすすめ / Optional',       lat: 44.250178, lng: 142.641306, note: '下川町の天然炭酸泉。入浴料400円前後。長距離運転の前に、ばっちり温まってから帰路へ。', optional: true, placeId: 'ChIJrZgsWGmZDV8Rbe5M8J8_M7s' },
+];
+
+const dayLabel = { 1: '4/24 金', 2: '4/25 土', 3: '4/26 日' };
+
+// ============ Map Init ============
+const map = L.map('map', {
+  zoomControl: true,
+  attributionControl: true,
+  scrollWheelZoom: true,
+});
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  subdomains: 'abcd',
+  maxZoom: 19,
+}).addTo(map);
+
+// Fit bounds to all stops initially
+const allBounds = L.latLngBounds(stops.map(s => [s.lat, s.lng]));
+map.fitBounds(allBounds, { padding: [60, 40], maxZoom: 10 });
+
+// ============ Markers ============
+function createMarkerIcon(stop) {
+  return L.divIcon({
+    className: 'custom-marker-wrapper',
+    html: `<div class="marker-pin" data-day="${stop.day}" data-optional="${stop.optional}" data-id="${stop.id}">
+             <div class="marker-body"><span>${stop.seq}</span></div>
+           </div>`,
+    iconSize: [34, 42],
+    iconAnchor: [17, 42],
+  });
+}
+
+const markers = {};
+stops.forEach(stop => {
+  const marker = L.marker([stop.lat, stop.lng], {
+    icon: createMarkerIcon(stop),
+    zIndexOffset: stop.optional ? 0 : 100,
+  }).addTo(map);
+  marker.on('click', () => showDetail(stop, marker));
+  markers[stop.id] = { marker, stop };
+});
+
+// ============ Route lines per day ============
+const dayColors = { 1: '#2d4a36', 2: '#c8a15a', 3: '#8b5a3c' };
+const routeLayers = {};
+
+[1, 2, 3].forEach(day => {
+  const dayStops = stops.filter(s => s.day === day && !s.optional);
+  if (dayStops.length < 2) return;
+  const coords = dayStops.map(s => [s.lat, s.lng]);
+  const line = L.polyline(coords, {
+    color: dayColors[day],
+    weight: 2,
+    opacity: 0.55,
+    dashArray: '4 8',
+    className: 'route-line',
+    lineCap: 'round',
+    lineJoin: 'round',
+  }).addTo(map);
+  routeLayers[day] = line;
+});
+
+// Optional stop connector (thinner, steam color)
+stops.filter(s => s.optional).forEach(optStop => {
+  const dayStops = stops.filter(s => s.day === optStop.day && !s.optional);
+  if (dayStops.length === 0) return;
+  // connect optional to nearest non-optional in same day by seq proximity
+  const before = dayStops.filter(s => s.seq <= optStop.seq).slice(-1)[0];
+  const after  = dayStops.filter(s => s.seq >  optStop.seq)[0];
+  const connections = [before, after].filter(Boolean);
+  connections.forEach(target => {
+    L.polyline([[optStop.lat, optStop.lng], [target.lat, target.lng]], {
+      color: '#6b8e9a',
+      weight: 1.5,
+      opacity: 0.45,
+      dashArray: '2 6',
+      lineCap: 'round',
+    }).addTo(map);
+  });
+});
+
+// ============ Detail Panel ============
+const panel = document.getElementById('detailPanel');
+const elTime = document.getElementById('detailTime');
+const elTitle = document.getElementById('detailTitle');
+const elSubtitle = document.getElementById('detailSubtitle');
+const elNote = document.getElementById('detailNote');
+const elLink = document.getElementById('detailLink');
+const elDayTag = document.getElementById('detailDayTag');
+let activeMarkerEl = null;
+
+function showDetail(stop, marker) {
+  elTime.textContent = stop.time;
+  elTitle.textContent = stop.title;
+  elSubtitle.textContent = stop.subtitle;
+  elNote.textContent = stop.note;
+  elDayTag.textContent = dayLabel[stop.day];
+  elDayTag.dataset.day = stop.day;
+  elDayTag.dataset.optional = stop.optional;
+  elLink.href = `https://www.google.com/maps/place/?q=place_id:${stop.placeId}`;
+
+  panel.classList.add('visible');
+
+  // Active marker styling
+  document.querySelectorAll('.marker-pin.active').forEach(el => el.classList.remove('active'));
+  const el = marker.getElement()?.querySelector('.marker-pin');
+  if (el) { el.classList.add('active'); activeMarkerEl = el; }
+
+  // Pan to marker
+  map.panTo([stop.lat, stop.lng], { animate: true, duration: 0.5 });
+}
+
+function hideDetail() {
+  panel.classList.remove('visible');
+  if (activeMarkerEl) { activeMarkerEl.classList.remove('active'); activeMarkerEl = null; }
+}
+
+document.getElementById('detailClose').addEventListener('click', hideDetail);
+map.on('click', hideDetail);
+
+// ============ Day Filter ============
+const chips = document.querySelectorAll('.chip[data-day]');
+let activeDay = 'all';
+
+chips.forEach(chip => {
+  chip.addEventListener('click', () => {
+    chips.forEach(c => c.setAttribute('aria-pressed', 'false'));
+    chip.setAttribute('aria-pressed', 'true');
+    activeDay = chip.dataset.day;
+    applyFilters();
+  });
+});
+
+// ============ Optional Toggle ============
+const optionalToggle = document.getElementById('optionalToggle');
+let showOptional = true;
+
+optionalToggle.addEventListener('click', () => {
+  showOptional = !showOptional;
+  optionalToggle.setAttribute('aria-pressed', showOptional ? 'true' : 'false');
+  applyFilters();
+});
+
+function applyFilters() {
+  stops.forEach(stop => {
+    const { marker } = markers[stop.id];
+    const dayMatch = activeDay === 'all' || String(stop.day) === activeDay;
+    const optMatch = !stop.optional || showOptional;
+    const visible = dayMatch && optMatch;
+
+    if (visible) {
+      marker.addTo(map);
+      const el = marker.getElement()?.querySelector('.marker-pin');
+      if (el) el.classList.remove('marker-hidden');
+    } else {
+      map.removeLayer(marker);
+    }
+  });
+
+  // Route lines
+  [1, 2, 3].forEach(day => {
+    const line = routeLayers[day];
+    if (!line) return;
+    const show = activeDay === 'all' || activeDay === String(day);
+    if (show) { line.addTo(map); } else { map.removeLayer(line); }
+  });
+
+  // Fit bounds to visible
+  const visibleStops = stops.filter(s => {
+    const dayMatch = activeDay === 'all' || String(s.day) === activeDay;
+    const optMatch = !s.optional || showOptional;
+    return dayMatch && optMatch;
+  });
+  if (visibleStops.length > 0) {
+    const bounds = L.latLngBounds(visibleStops.map(s => [s.lat, s.lng]));
+    map.fitBounds(bounds, { padding: [60, 40], maxZoom: 11, animate: true });
+  }
+
+  hideDetail();
+}
+
+// Initial filter apply
+applyFilters();
+
+// ============ Keyboard ============
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') hideDetail();
+});
+</script>
+
+</body>
+</html>
